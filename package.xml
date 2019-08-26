@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>mc_rbdyn_urdf</name>
+  <version>1.0.0</version>
+  <description>This library allows to parse an URDF file and create RBDyn structure from it. It is entirely ROS-free.</description>
+  <maintainer email="jrl-info-ml@aist.go.jp">CNRS-UM LIRMM, CNRS-AIST JRL</maintainer>
+  <license>BSD</license>
+
+  <url type="website">https://github.com/jrl-umi3218/mc_rbdyn_urdf</url>
+  <url type="bugtracker">https://github.com/jrl-umi3218/mc_rbdyn_urdf/issues</url>
+  <url type="repository">https://github.com/jrl-umi3218/mc_rbdyn_urdf</url>
+
+  <author>CNRS-UM LIRMM, CNRS-AIST JRL</author>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <build_depend>cmake</build_depend>
+  <build_depend>boost</build_depend>
+  <build_depend>eigen</build_depend>
+
+  <run_depend>boost</run_depend>
+  <run_depend>eigen</run_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
