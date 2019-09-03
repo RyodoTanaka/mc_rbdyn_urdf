@@ -246,7 +246,7 @@ std::string parseMultiBodyGraphFromURDF(URDFParserResult & res,
         }
         else
         {
-          std::cerr << "Warning: only mesh geometry is supported, visual element has been ignored" << std::endl;
+            // std::cerr << "Warning: only mesh geometry is supported, visual element has been ignored" << std::endl;
         }
         const char * name = child->Attribute("name");
         if(name) v.name = name;
