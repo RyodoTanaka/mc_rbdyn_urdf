@@ -89,11 +89,9 @@ std::string XYZSarmUrdf(
   </robot>
 )");
 
-int main()
-{
+int main() {
   auto robot = mc_rbdyn_urdf::rbdyn_from_urdf(XYZSarmUrdf);
-  for(const auto & b : robot.mb.bodies())
-  {
+  for (const auto &b : robot.mb.bodies()) {
     std::cout << b.name() << "\n";
   }
   return 0;

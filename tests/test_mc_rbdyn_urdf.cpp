@@ -109,40 +109,33 @@ std::string XYZSarmUrdf(
   </robot>
 )");
 
-namespace mc_rbdyn_urdf
-{
-bool operator==(const Geometry::Mesh & m1, const Geometry::Mesh & m2)
-{
+namespace mc_rbdyn_urdf {
+bool operator==(const Geometry::Mesh &m1, const Geometry::Mesh &m2) {
   return m1.scale == m2.scale && m1.filename == m2.filename;
 }
 
-bool operator==(const Geometry::Box & b1, const Geometry::Box & b2)
-{
+bool operator==(const Geometry::Box &b1, const Geometry::Box &b2) {
   return b1.size == b2.size;
 }
 
-bool operator==(const Geometry::Sphere & b1, const Geometry::Sphere & b2)
-{
+bool operator==(const Geometry::Sphere &b1, const Geometry::Sphere &b2) {
   return b1.radius == b2.radius;
 }
 
-bool operator==(const Geometry::Cylinder & b1, const Geometry::Cylinder & b2)
-{
+bool operator==(const Geometry::Cylinder &b1, const Geometry::Cylinder &b2) {
   return b1.radius == b2.radius && b1.length == b2.length;
 }
 
-bool operator==(const Geometry & g1, const Geometry & g2)
-{
+bool operator==(const Geometry &g1, const Geometry &g2) {
   return g1.type == g2.type && g1.data == g2.data;
 }
-bool operator==(const Visual & v1, const Visual & v2)
-{
-  return v1.name == v2.name && v1.origin == v2.origin && v1.geometry == v2.geometry;
+bool operator==(const Visual &v1, const Visual &v2) {
+  return v1.name == v2.name && v1.origin == v2.origin &&
+         v1.geometry == v2.geometry;
 }
 } // namespace mc_rbdyn_urdf
 
-mc_rbdyn_urdf::URDFParserResult createRobot()
-{
+mc_rbdyn_urdf::URDFParserResult createRobot() {
   mc_rbdyn_urdf::URDFParserResult res;
 
   Eigen::Matrix3d I0, I1, I2, I3, I4;
@@ -188,7 +181,9 @@ mc_rbdyn_urdf::URDFParserResult createRobot()
   res.mbg.linkBodies("b0", to, "b1", from, "j0");
   res.mbg.linkBodies("b1", to, "b2", from, "j1");
   res.mbg.linkBodies("b2", to, "b3", from, "j2");
-  res.mbg.linkBodies("b1", sva::PTransformd(sva::RotX(1.), Eigen::Vector3d(1., 0., 0.)), "b4", from, "j3");
+  res.mbg.linkBodies(
+      "b1", sva::PTransformd(sva::RotX(1.), Eigen::Vector3d(1., 0., 0.)), "b4",
+      from, "j3");
 
   res.limits.lower = {{"j0", {-1.}}, {"j1", {-1.}}, {"j2", {-1.}}};
   res.limits.upper = {{"j0", {1.}}, {"j1", {1.}}, {"j2", {1.}}};
@@ -198,11 +193,13 @@ mc_rbdyn_urdf::URDFParserResult createRobot()
   mc_rbdyn_urdf::Visual v1, v2;
   v1.origin = sva::PTransformd(T0.rotation(), T0.translation());
   v1.geometry.type = mc_rbdyn_urdf::Geometry::Type::MESH;
-  boost::get<mc_rbdyn_urdf::Geometry::Mesh>(v1.geometry.data).filename = "test_mesh1.dae";
+  boost::get<mc_rbdyn_urdf::Geometry::Mesh>(v1.geometry.data).filename =
+      "test_mesh1.dae";
 
   v2.origin = sva::PTransformd(T1.rotation(), T1.translation());
   v2.geometry.type = mc_rbdyn_urdf::Geometry::Type::MESH;
-  boost::get<mc_rbdyn_urdf::Geometry::Mesh>(v2.geometry.data).filename = "test_mesh2.dae";
+  boost::get<mc_rbdyn_urdf::Geometry::Mesh>(v2.geometry.data).filename =
+      "test_mesh2.dae";
 
   res.visual = {{"b0", {v1, v2}}};
 
@@ -215,8 +212,7 @@ mc_rbdyn_urdf::URDFParserResult createRobot()
 
 const double TOL = 1e-6;
 
-BOOST_AUTO_TEST_CASE(loadTest)
-{
+BOOST_AUTO_TEST_CASE(loadTest) {
   auto cppRobot = createRobot();
   auto strRobot = mc_rbdyn_urdf::rbdyn_from_urdf(XYZSarmUrdf);
 
@@ -225,36 +221,47 @@ BOOST_AUTO_TEST_CASE(loadTest)
   BOOST_CHECK_EQUAL(cppRobot.mb.nrParams(), strRobot.mb.nrParams());
   BOOST_CHECK_EQUAL(cppRobot.mb.nrDof(), strRobot.mb.nrDof());
 
-  BOOST_CHECK(std::equal(cppRobot.mb.predecessors().begin(), cppRobot.mb.predecessors().end(),
+  BOOST_CHECK(std::equal(cppRobot.mb.predecessors().begin(),
+                         cppRobot.mb.predecessors().end(),
                          strRobot.mb.predecessors().begin()));
-  BOOST_CHECK(
-      std::equal(cppRobot.mb.successors().begin(), cppRobot.mb.successors().end(), strRobot.mb.successors().begin()));
-  BOOST_CHECK(std::equal(cppRobot.mb.parents().begin(), cppRobot.mb.parents().end(), strRobot.mb.parents().begin()));
-  BOOST_CHECK(
-      std::equal(cppRobot.mb.transforms().begin(), cppRobot.mb.transforms().end(), strRobot.mb.transforms().begin()));
+  BOOST_CHECK(std::equal(cppRobot.mb.successors().begin(),
+                         cppRobot.mb.successors().end(),
+                         strRobot.mb.successors().begin()));
+  BOOST_CHECK(std::equal(cppRobot.mb.parents().begin(),
+                         cppRobot.mb.parents().end(),
+                         strRobot.mb.parents().begin()));
+  BOOST_CHECK(std::equal(cppRobot.mb.transforms().begin(),
+                         cppRobot.mb.transforms().end(),
+                         strRobot.mb.transforms().begin()));
 
-  BOOST_CHECK(std::equal(cppRobot.limits.lower.begin(), cppRobot.limits.lower.end(), strRobot.limits.lower.begin()));
-  BOOST_CHECK(std::equal(cppRobot.limits.upper.begin(), cppRobot.limits.upper.end(), strRobot.limits.upper.begin()));
-  BOOST_CHECK(
-      std::equal(cppRobot.limits.velocity.begin(), cppRobot.limits.velocity.end(), strRobot.limits.velocity.begin()));
-  BOOST_CHECK(std::equal(cppRobot.limits.torque.begin(), cppRobot.limits.torque.end(), strRobot.limits.torque.begin()));
+  BOOST_CHECK(std::equal(cppRobot.limits.lower.begin(),
+                         cppRobot.limits.lower.end(),
+                         strRobot.limits.lower.begin()));
+  BOOST_CHECK(std::equal(cppRobot.limits.upper.begin(),
+                         cppRobot.limits.upper.end(),
+                         strRobot.limits.upper.begin()));
+  BOOST_CHECK(std::equal(cppRobot.limits.velocity.begin(),
+                         cppRobot.limits.velocity.end(),
+                         strRobot.limits.velocity.begin()));
+  BOOST_CHECK(std::equal(cppRobot.limits.torque.begin(),
+                         cppRobot.limits.torque.end(),
+                         strRobot.limits.torque.begin()));
 
-  for(int i = 0; i < cppRobot.mb.nrBodies(); ++i)
-  {
-    const auto & b1 = cppRobot.mb.body(i);
-    const auto & b2 = strRobot.mb.body(i);
+  for (int i = 0; i < cppRobot.mb.nrBodies(); ++i) {
+    const auto &b1 = cppRobot.mb.body(i);
+    const auto &b2 = strRobot.mb.body(i);
 
     BOOST_CHECK_EQUAL(b1.name(), b2.name());
 
     BOOST_CHECK_EQUAL(b1.inertia().mass(), b2.inertia().mass());
     BOOST_CHECK_EQUAL(b1.inertia().momentum(), b2.inertia().momentum());
-    BOOST_CHECK_SMALL((b1.inertia().inertia() - b2.inertia().inertia()).norm(), TOL);
+    BOOST_CHECK_SMALL((b1.inertia().inertia() - b2.inertia().inertia()).norm(),
+                      TOL);
   }
 
-  for(int i = 0; i < cppRobot.mb.nrJoints(); ++i)
-  {
-    const auto & j1 = cppRobot.mb.joint(i);
-    const auto & j2 = strRobot.mb.joint(i);
+  for (int i = 0; i < cppRobot.mb.nrJoints(); ++i) {
+    const auto &j1 = cppRobot.mb.joint(i);
+    const auto &j2 = strRobot.mb.joint(i);
 
     BOOST_CHECK_EQUAL(j1.name(), j2.name());
     BOOST_CHECK_EQUAL(j1.type(), j2.type());
@@ -263,22 +270,20 @@ BOOST_AUTO_TEST_CASE(loadTest)
   }
 }
 
-BOOST_AUTO_TEST_CASE(visualTest)
-{
+BOOST_AUTO_TEST_CASE(visualTest) {
   auto cppRobot = createRobot();
   auto strRobot = mc_rbdyn_urdf::rbdyn_from_urdf(XYZSarmUrdf);
-  const auto & cpp_geometries = cppRobot.visual;
-  const auto & str_geometries = strRobot.visual;
+  const auto &cpp_geometries = cppRobot.visual;
+  const auto &str_geometries = strRobot.visual;
 
   BOOST_CHECK_EQUAL(str_geometries.size(), cpp_geometries.size());
-  for(const auto & g : str_geometries)
-  {
+  for (const auto &g : str_geometries) {
     BOOST_CHECK_EQUAL(g.second.size(), cpp_geometries.at(g.first).size());
   }
 
-  for(const auto & body : cppRobot.mb.bodies())
-  {
-    BOOST_CHECK(std::equal(strRobot.visual[body.name()].begin(), strRobot.visual[body.name()].end(),
+  for (const auto &body : cppRobot.mb.bodies()) {
+    BOOST_CHECK(std::equal(strRobot.visual[body.name()].begin(),
+                           strRobot.visual[body.name()].end(),
                            cppRobot.visual[body.name()].begin()));
   }
 }
